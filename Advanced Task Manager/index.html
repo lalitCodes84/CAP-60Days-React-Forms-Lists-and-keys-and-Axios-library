@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Setting character set and viewport -->
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Title of the page -->
+    <title>Advanced Task Manager</title>
+    <!-- CSS styling -->
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+
+      h1 {
+        text-align: center;
+        margin-top: 20px;
+      }
+
+      form {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: center;
+      }
+
+      input[type="text"] {
+        padding: 8px;
+        margin-right: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      button {
+        padding: 8px 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+
+      li {
+        background-color: #fff;
+        padding: 10px;
+        margin-bottom: 5px;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+      }
+
+      input[type="checkbox"] {
+        margin-right: 10px;
+      }
+
+      span {
+        flex-grow: 1;
+      }
+
+      button.deleteBtn {
+        background-color: #f44336;
+      }
+
+      button.deleteBtn:hover {
+        background-color: #d32f2f;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Root element for React rendering -->
+    <div id="root"></div>
+  </body>
+  <!-- Script tags for React, Axios, and Babel -->
+  <script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script type="text/babel">
+    // Importing React hooks
+    const { useState } = React;
+
+    // Functional component for TaskManager
+    function TaskManager() {
+      // State for managing tasks and form inputs
+      const [tasks, setTasks] = useState([]);
+      const [newTask, setNewTask] = useState({ title: '', isCompleted: false, assignee: '' });
+
+      // Function to handle form input change
+      const handleInputChange = (event) => {
+        const { name, value } = event.target;
+        setNewTask({ ...newTask, [name]: value });
+      };
+
+      // Function to add a new task
+      const addTask = () => {
+        axios.post('http://localhost:3000/todos', newTask)
+          .then(response => {
+            setTasks([...tasks, response.data]);
+            setNewTask({ title: '', isCompleted: false, assignee: '' });
+          })
+          .catch(error => console.error('Error adding task:', error));
+      };
+
+      // Function to update an existing task
+      const updateTask = (id, updatedTask) => {
+        axios.put(`http://localhost:3000/todos/${id}`, updatedTask)
+          .then(response => {
+            const updatedTasks = tasks.map(task => (task.id === id ? response.data : task));
+            setTasks(updatedTasks);
+          })
+          .catch(error => console.error('Error updating task:', error));
+      };
+
+      // Function to delete an existing task
+      const deleteTask = (id) => {
+        axios.delete(`http://localhost:3000/todos/${id}`)
+          .then(() => {
+            const updatedTasks = tasks.filter(task => task.id !== id);
+            setTasks(updatedTasks);
+          })
+          .catch(error => console.error('Error deleting task:', error));
+      };
+
+      // Function to get all tasks
+      const getAllTasks = () => {
+        axios.get('http://localhost:3000/todos')
+          .then(response => setTasks(response.data))
+          .catch(error => console.error('Error getting tasks:', error));
+      };
+
+      // Function to filter incomplete tasks
+      const showIncompleteTasks = () => {
+        const incompleteTasks = tasks.filter(task => !task.isCompleted);
+        setTasks(incompleteTasks);
+      };
+
+      // JSX rendering
+      return (
+        <div>
+          <h1>Advanced Task Manager</h1>
+          <form onSubmit={(e) => { e.preventDefault(); addTask(); }}>
+            <input
+              type="text"
+              name="title"
+              placeholder="Title"
+              value={newTask.title}
+              onChange={handleInputChange}
+            />
+            <input
+              type="text"
+              name="assignee"
+              placeholder="Assignee"
+              value={newTask.assignee}
+              onChange={handleInputChange}
+            />
+            <button type="submit">Add Task</button>
+          </form>
+          <button onClick={getAllTasks}>Get all tasks</button>
+          <button onClick={showIncompleteTasks}>Show incomplete tasks</button>
+          <ul>
+            {/* Mapping tasks to list items */}
+            {tasks.map(task => (
+              <li key={task.id}>
+                <input
+                  type="checkbox"
+                  checked={task.isCompleted}
+                  onChange={(e) => updateTask(task.id, { ...task, isCompleted: e.target.checked })}
+                />
+                <span>{task.title} - {task.assignee}</span>
+                <button className="deleteBtn" onClick={() => deleteTask(task.id)}>Delete</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    // Rendering TaskManager component to the DOM
+    ReactDOM.render(<TaskManager />, document.getElementById('root'));
+  </script>
+</html>

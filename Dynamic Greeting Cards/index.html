@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    #root>div{
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        text-align: center;
+        border: 1px solid rgba(0, 0, 0, 0.132);
+    }
+    #root>div>div{
+        /* border: 1px solid black; */
+        margin: 5%;
+        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+        border-radius: 0% 25%;
+    }
+  </style>
+  <title>Dynamic Greeting Cards</title>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script src="https://www.unpkg.com/react@18.2.0/umd/react.development.js"></script>
+  <script src="https://www.unpkg.com/react-dom@18.2.0/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <script type="text/babel">
+    // Your  code will go here
+    function GreetingCard(props){
+        const { name, greeting = "Happy Birthday" } = props;
+
+        return (
+            <div>
+                <h1>Welcome {name}</h1>
+                <h2>{greeting}</h2>
+            </div>
+        );
+    }
+
+    function App(){
+        const names = [
+            { name: "John", greeting: "Happy Birthday" },
+            { name: "Abigail", greeting: "Happy Birthday" },
+            { name: "Sandesh", greeting: "Happy Birthday" },
+            { name: "Himanshu", greeting: "Happy Birthday" },
+            { name: "Golu", greeting: "Happy Birthday" },
+            { name: "Akash", greeting: "Happy Birthday" },
+            { name: "Divyanshu", greeting: "Happy Birthday" }
+        ];
+
+        return (
+            <div>
+                {names.map((person, index) => (
+                    <GreetingCard key={index} name={person.name} greeting={person.greeting} />
+                ))}
+            </div>
+        );
+    }
+
+    const root = document.getElementById("root");
+    ReactDOM.createRoot(root).render(<App/>)
+  </script>
+</body>
+</html>

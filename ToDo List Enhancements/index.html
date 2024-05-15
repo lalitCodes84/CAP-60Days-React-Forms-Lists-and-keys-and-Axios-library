@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- Setting character set and viewport -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- Title of the page -->
+  <title>ToDo List</title>
+  <!-- Styling for the ToDo List -->
+  <style>
+    /* Setting font for the body */
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    /* Container for the todo list */
+    .todo-container {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* Style for each todo item */
+    .todo-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    /* Checkbox styling */
+    .todo-item input[type="checkbox"] {
+      margin-right: 8px;
+    }
+
+    /* Styling for completed tasks */
+    .completed {
+      text-decoration: line-through;
+    }
+
+    /* Styling for the delete button */
+    .todo-item button {
+      margin-left: 8px;
+      background-color: aqua;
+      color: black;
+      border: none;
+      cursor: pointer;
+    }
+    /* Styling for the Add button */
+    .addBtn{
+        margin-left: 5%;
+        width: 6vw;
+        background-color: aqua;
+    }
+  </style>
+</head>
+<body>
+  <!-- Root element for React rendering -->
+  <div id="root"></div>
+
+  <!-- React and Babel scripts -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- React code -->
+  <script type="text/babel">
+    // Importing React hooks
+    const { useState } = React;
+
+    // Functional component for ToDoList
+    function ToDoList() {
+      // State for managing todos and input value
+      const [todos, setTodos] = useState([]);
+      const [inputValue, setInputValue] = useState('');
+
+      // Handling input change
+      const handleInputChange = (event) => {
+        setInputValue(event.target.value);
+      };
+
+      // Adding a new todo
+      const addTodo = () => {
+        if (inputValue.trim() !== '') {
+          setTodos([...todos, { text: inputValue, completed: false }]);
+          setInputValue('');
+        }
+      };
+
+      // Deleting a todo
+      const deleteTodo = (index) => {
+        setTodos(todos.filter((_, i) => i !== index));
+      };
+
+      // Toggling completion of a todo
+      const toggleCompletion = (index) => {
+        const updatedTodos = [...todos];
+        updatedTodos[index].completed = !updatedTodos[index].completed;
+        setTodos(updatedTodos);
+      };
+
+      // JSX rendering
+      return (
+        <div className="todo-container">
+          <h1>ToDo List</h1>
+          <div>
+            <input
+              type="text"
+              placeholder="Add new todo"
+              value={inputValue}
+              onChange={handleInputChange}
+            />
+            <button className="addBtn" onClick={addTodo}>Add</button>
+          </div>
+          <ul>
+            {/* Mapping todos to list items */}
+            {todos.map((todo, index) => (
+              <li key={index} className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={() => toggleCompletion(index)}
+                />
+                <span>{todo.text}</span>
+                <button onClick={() => deleteTodo(index)}>Delete</button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    }
+
+    // Rendering ToDoList component to the DOM
+    ReactDOM.render(<ToDoList />, document.getElementById('root'));
+  </script>
+</body>
+</html>
